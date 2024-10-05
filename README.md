@@ -36,9 +36,10 @@ Simple ReactAgent where in first step it looking something in internet using TAV
 
 [main.py](main.py) - It's based on basic streamlit library so to run app you have to run command `streamlit run main.py`
 
-#### 5. ReactAgent Algorithm
+#### 5. Reflexion Agent Algorithm
 
-Pipeline is simple ReactAgent where in first step he is looking for info in internet and then triple this output.
+Pipeline is Reflexion Agent where in first step we send it prompt then he is looking for info using Tavily and after that it's checking his answer few times to get better results.
+
 ![graph.png](png/graph_readme.png)
 
 #### 6. LangGraph Studio

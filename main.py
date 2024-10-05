@@ -1,43 +1,36 @@
+import streamlit as st
 from dotenv import load_dotenv
 
-from typing import List
-
-from langchain_core.messages import BaseMessage, ToolMessage
-from langgraph.graph import END, MessageGraph
-
-from chains import revisor, first_responder
-from tool_executor import execute_tools
-
-load_dotenv()
-
-MAX_ITERATIONS = 2
-builder = MessageGraph()
-builder.add_node("draft", first_responder)
-builder.add_node("execute_tools", execute_tools)
-builder.add_node("revise", revisor)
-builder.add_edge("draft", "execute_tools")
-builder.add_edge("execute_tools", "revise")
+from src.graph_function import build_reflexion_agent
 
 
-def event_loop(state: List[BaseMessage]) -> str:
-    count_tool_visit = sum(isinstance(item, ToolMessage) for item in state)
-    num_iterations = count_tool_visit
-    if num_iterations > MAX_ITERATIONS:
-        return END
-    return "execute_tools"
+def main():
+    load_dotenv()
 
+    builder = build_reflexion_agent()
+    graph = builder.compile()
 
-builder.add_conditional_edges("revise", event_loop)
-builder.set_entry_point("draft")
-graph = builder.compile()
+    # Streamlit app title
+    st.title("Reflexion Agent")
 
-print(graph.get_graph().draw_ascii())
-graph.get_graph().draw_mermaid_png(output_file_path="graph.png")
+    # User input text field
+    user_input = st.text_input(
+        "Enter your prompt:",
+        value="Write about AI-Powered SOC / autonomous SOC problem domain, list startups that do that and raised capital.",
+    )
+
+    # Submit button
+    if st.button("Submit"):
+        with st.spinner("Processing..."):
+            try:
+                # Invoke the graph with user input
+                res = graph.invoke(user_input)
+                # Extract and display the answer
+                answer = res[-1].tool_calls[0]["args"]["answer"]
+                st.write(answer)
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
-    print("Hello Reflexion Agent")
-    res = graph.invoke(
-        "Write about AI-Powered SOC / autonomous soc  problem domain, list startups that do that and raised capital."
-    )
-    print(res[-1].tool_calls[0]["args"]["answer"])
-
+    main()

@@ -6,15 +6,15 @@ load_dotenv()
 
 from langchain.output_parsers.openai_tools import (
     JsonOutputToolsParser,
-    PydanticToolsParser
+    PydanticToolsParser,
 )
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 
-from schemas import AnswerQuestion, ReviseAnswer
+from src.schemas import AnswerQuestion, ReviseAnswer
 
-llm = ChatOpenAI(model='gpt-4o')
+llm = ChatOpenAI(model="gpt-4o")
 parser = JsonOutputToolsParser(return_id=True)
 parser_pydantic = PydanticToolsParser(tools=[AnswerQuestion])
 
@@ -30,11 +30,9 @@ Current time: {time}
 3. Recommend search queries to research information and improve your answer.""",
         ),
         MessagesPlaceholder(variable_name="messages"),
-        ("system", "Answer the user's question above using the required format.")
+        ("system", "Answer the user's question above using the required format."),
     ]
-).partial(
-    time=lambda: datetime.datetime.now().isoformat()
-)
+).partial(time=lambda: datetime.datetime.now().isoformat())
 
 first_responder_prompt_template = actor_prompt_template.partial(
     first_instruction="Provide a detailed ~250 word answer."

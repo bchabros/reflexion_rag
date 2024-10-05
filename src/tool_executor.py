@@ -7,7 +7,7 @@ from langchain_community.utilities.tavily_search import TavilySearchAPIWrapper
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langgraph.prebuilt import ToolInvocation, ToolExecutor
 
-from chains import parser
+from src.chains import parser
 
 search = TavilySearchAPIWrapper()
 tavily_tool = TavilySearchResults(api_wrapper=search, max_results=5)
@@ -15,6 +15,10 @@ tool_executor = ToolExecutor([tavily_tool])
 
 
 def execute_tools(state: List[BaseMessage]) -> List[BaseMessage]:
+    """
+    :param state: A list of base messages representing the current state of the tool execution.
+    :return: A list of tool messages generated from the tool invocations.
+    """
     tool_invocation: AIMessage = state[-1]
     parsed_tool_calls = parser.invoke(tool_invocation)
     ids = []
